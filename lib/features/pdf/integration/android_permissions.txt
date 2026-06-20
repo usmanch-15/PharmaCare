@@ -1,0 +1,31 @@
+# Add to android/app/src/main/AndroidManifest.xml
+# Inside the <manifest> tag (NOT inside <application>):
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"/>
+
+# For Android 13+ (API 33+), no storage permission needed for app-specific dirs.
+# path_provider uses getExternalStorageDirectory() which is app-scoped.
+
+# Inside <application> tag, add FileProvider for share_plus:
+
+    <provider
+        android:name="androidx.core.content.FileProvider"
+        android:authorities="${applicationId}.fileprovider"
+        android:exported="false"
+        android:grantUriPermissions="true">
+        <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/file_paths"/>
+    </provider>
+
+# Create android/app/src/main/res/xml/file_paths.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <files-path name="files" path="."/>
+    <external-files-path name="external_files" path="."/>
+    <cache-path name="cache" path="."/>
+</paths>
