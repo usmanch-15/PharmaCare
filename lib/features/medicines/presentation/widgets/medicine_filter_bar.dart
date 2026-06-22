@@ -163,7 +163,7 @@ class _DropdownChip<T> extends StatelessWidget {
           ),
         );
         if (selected != null) {
-          onChanged(value == selected ? null : selected);
+          onChanged(value == selected ? null : selected as T?);
         }
       },
       child: AnimatedContainer(

@@ -10,7 +10,9 @@ class BarcodeRepositoryImpl implements BarcodeRepository {
   final BarcodeScannerDataSource _ds;
 
   Either<Failure, T> _h<T>(Object e) {
-    if (e is PermissionException) return Left(PermissionFailure(e.message));
+    if (e is PermissionException) {
+      return Left(PermissionFailure(e.message ?? 'Permission denied'));
+    }
     return Left(UnexpectedFailure(e.toString()));
   }
 
@@ -28,8 +30,6 @@ class BarcodeRepositoryImpl implements BarcodeRepository {
 
   @override
   Future<Either<Failure, ScanResult>> scan() async {
-    // Scan is handled by BarcodeScannerWidget (live camera stream)
-    // This method is a fallback for one-shot scans if needed.
     return const Left(UnexpectedFailure(
         'Use BarcodeScannerWidget for scanning.'));
   }

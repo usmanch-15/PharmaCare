@@ -5,40 +5,22 @@ import 'package:pdf/widgets.dart' as pw;
 
 import '../models/pharmacy_info.dart';
 import '../templates/invoice_template.dart';
-// ── Import your invoice entity from Step 8 ──
-// import '../../sales/domain/entities/invoice_entity.dart';
 
-/// Builds a complete pharmacy invoice PDF from an [InvoiceEntity].
-///
-/// Usage:
-/// ```dart
-/// final generator = InvoicePdfGenerator();
-/// final bytes = await generator.generate(invoice, pharmacyInfo);
-/// ```
 class InvoicePdfGenerator {
   const InvoicePdfGenerator();
 
-  // Currency formatter
-  static final _currFmt =
-      NumberFormat.currency(symbol: 'Rs ', decimalDigits: 2);
-  static final _currFmt0 =
-      NumberFormat.currency(symbol: 'Rs ', decimalDigits: 0);
+  static final _currFmt  = NumberFormat.currency(symbol: 'Rs ', decimalDigits: 2);
+  static final _currFmt0 = NumberFormat.currency(symbol: 'Rs ', decimalDigits: 0);
 
-  /// Generates and returns raw PDF bytes.
-  /// Pass [invoice] as your InvoiceEntity from Step 8.
-  Future<Uint8List> generate(
-    dynamic invoice,              // InvoiceEntity
-    PharmacyInfo pharmacy,
-  ) async {
+  Future<Uint8List> generate(dynamic invoice, PharmacyInfo pharmacy) async {
     final pdf = pw.Document(
       title:   invoice.invoiceNo,
       author:  pharmacy.name,
       creator: 'PharmaCare App',
     );
 
-    // Load fonts (bundled with pdf package)
-    final baseFont  = await _loadFont(pw.Font.helvetica());
-    final boldFont  = await _loadFont(pw.Font.helveticaBold());
+    final baseFont   = await _loadFont(pw.Font.helvetica());
+    final boldFont   = await _loadFont(pw.Font.helveticaBold());
     final italicFont = await _loadFont(pw.Font.helveticaOblique());
 
     final theme = pw.ThemeData.withFont(
@@ -71,99 +53,73 @@ class InvoicePdfGenerator {
     return pdf.save();
   }
 
-  // ── Page theme ────────────────────────────────────────────────────────────
-
   pw.PageTheme _pageTheme(pw.ThemeData theme) {
     return pw.PageTheme(
-      theme: theme,
+      theme:      theme,
       pageFormat: PdfPageFormat.a4,
-      margin: InvoiceTemplate.pageMargin,
+      margin:     InvoiceTemplate.pageMargin,
       buildBackground: (ctx) => pw.Container(
-        decoration: const pw.BoxDecoration(
-          color: InvoiceTemplate.pageBackground,
-        ),
+        decoration: pw.BoxDecoration(color: InvoiceTemplate.pageBackground),
       ),
     );
   }
 
-  // ── HEADER ────────────────────────────────────────────────────────────────
-
-  pw.Widget _buildHeader(
-    pw.Context ctx,
-    PharmacyInfo pharmacy,
-    dynamic invoice,
-  ) {
+  pw.Widget _buildHeader(pw.Context ctx, PharmacyInfo pharmacy, dynamic invoice) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        // Top bar — pharmacy name + INVOICE label
         pw.Container(
-          decoration: const pw.BoxDecoration(
-            color: InvoiceTemplate.primary,
+          decoration: pw.BoxDecoration(
+            color:        InvoiceTemplate.primary,
             borderRadius: InvoiceTemplate.radius,
           ),
-          padding: const pw.EdgeInsets.symmetric(
-              horizontal: 20, vertical: 14),
+          padding: const pw.EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           child: pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             crossAxisAlignment: pw.CrossAxisAlignment.center,
             children: [
-              // Left: pharmacy name + tagline
               pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
-                  pw.Text(
-                    pharmacy.name,
-                    style: pw.TextStyle(
-                      color:      InvoiceTemplate.white,
-                      fontSize:   InvoiceTemplate.fontSizeTitle,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
-                  ),
-                  if (pharmacy.tagline != null)
-                    pw.Text(
-                      pharmacy.tagline!,
+                  pw.Text(pharmacy.name,
                       style: pw.TextStyle(
-                        color:    InvoiceTemplate.white.shade(0.7),
-                        fontSize: InvoiceTemplate.fontSizeSmall,
-                        fontStyle: pw.FontStyle.italic,
-                      ),
-                    ),
+                        color:      InvoiceTemplate.white,
+                        fontSize:   InvoiceTemplate.fontSizeTitle,
+                        fontWeight: pw.FontWeight.bold,
+                      )),
+                  if (pharmacy.tagline != null)
+                    pw.Text(pharmacy.tagline!,
+                        style: pw.TextStyle(
+                          color:     InvoiceTemplate.white.shade(0.7),
+                          fontSize:  InvoiceTemplate.fontSizeSmall,
+                          fontStyle: pw.FontStyle.italic,
+                        )),
                 ],
               ),
-              // Right: INVOICE + number
               pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.end,
                 children: [
-                  pw.Text(
-                    'INVOICE',
-                    style: pw.TextStyle(
-                      color:      InvoiceTemplate.white,
-                      fontSize:   InvoiceTemplate.fontSizeTitle,
-                      fontWeight: pw.FontWeight.bold,
-                      letterSpacing: 2,
-                    ),
-                  ),
-                  pw.Text(
-                    invoice.invoiceNo,
-                    style: pw.TextStyle(
-                      color:    InvoiceTemplate.white.shade(0.85),
-                      fontSize: InvoiceTemplate.fontSizeSubtitle,
-                    ),
-                  ),
+                  pw.Text('INVOICE',
+                      style: pw.TextStyle(
+                        color:         InvoiceTemplate.white,
+                        fontSize:      InvoiceTemplate.fontSizeTitle,
+                        fontWeight:    pw.FontWeight.bold,
+                        letterSpacing: 2,
+                      )),
+                  pw.Text(invoice.invoiceNo,
+                      style: pw.TextStyle(
+                        color:    InvoiceTemplate.white.shade(0.85),
+                        fontSize: InvoiceTemplate.fontSizeSubtitle,
+                      )),
                 ],
               ),
             ],
           ),
         ),
-
         pw.SizedBox(height: 10),
-
-        // Pharmacy info row
         pw.Row(
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
           children: [
-            // Address + contact
             pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
@@ -174,7 +130,6 @@ class InvoicePdfGenerator {
                   _infoText('🌐 ${pharmacy.website!}'),
               ],
             ),
-            // License + NTN
             pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.end,
               children: [
@@ -186,7 +141,6 @@ class InvoicePdfGenerator {
             ),
           ],
         ),
-
         pw.SizedBox(height: 10),
         pw.Divider(color: InvoiceTemplate.borderColor, thickness: 0.5),
         pw.SizedBox(height: 6),
@@ -194,13 +148,7 @@ class InvoicePdfGenerator {
     );
   }
 
-  // ── FOOTER ────────────────────────────────────────────────────────────────
-
-  pw.Widget _buildFooter(
-    pw.Context ctx,
-    PharmacyInfo pharmacy,
-    dynamic invoice,
-  ) {
+  pw.Widget _buildFooter(pw.Context ctx, PharmacyInfo pharmacy, dynamic invoice) {
     return pw.Column(
       children: [
         pw.Divider(color: InvoiceTemplate.borderColor, thickness: 0.5),
@@ -208,37 +156,26 @@ class InvoicePdfGenerator {
         pw.Row(
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
           children: [
-            pw.Text(
-              'Generated by PharmaCare App · ${pharmacy.name}',
-              style: pw.TextStyle(
-                fontSize: InvoiceTemplate.fontSizeTiny,
-                color:    InvoiceTemplate.textLight,
-              ),
-            ),
-            pw.Text(
-              'Page ${ctx.pageNumber} of ${ctx.pagesCount}',
-              style: pw.TextStyle(
-                fontSize: InvoiceTemplate.fontSizeTiny,
-                color:    InvoiceTemplate.textLight,
-              ),
-            ),
+            pw.Text('Generated by PharmaCare App · ${pharmacy.name}',
+                style: pw.TextStyle(
+                    fontSize: InvoiceTemplate.fontSizeTiny,
+                    color:    InvoiceTemplate.textLight)),
+            pw.Text('Page ${ctx.pageNumber} of ${ctx.pagesCount}',
+                style: pw.TextStyle(
+                    fontSize: InvoiceTemplate.fontSizeTiny,
+                    color:    InvoiceTemplate.textLight)),
           ],
         ),
       ],
     );
   }
 
-  // ── CUSTOMER SECTION ──────────────────────────────────────────────────────
-
   pw.Widget _buildCustomerSection(dynamic invoice) {
-    final dateFmt =
-        DateFormat('dd MMMM yyyy  ·  hh:mm a');
-
+    final dateFmt = DateFormat('dd MMMM yyyy  ·  hh:mm a');
     return pw.Row(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        // Bill to
-        Expanded(
+        _PwExpanded(
           flex: 3,
           child: _infoBox(
             title: 'BILL TO',
@@ -252,14 +189,12 @@ class InvoicePdfGenerator {
           ),
         ),
         pw.SizedBox(width: 12),
-        // Invoice meta
-        Expanded(
+        _PwExpanded(
           flex: 2,
           child: _infoBox(
             title: 'INVOICE DETAILS',
             children: [
-              _metaRow('Date',
-                  dateFmt.format(invoice.createdAt)),
+              _metaRow('Date',    dateFmt.format(invoice.createdAt)),
               _metaRow('Sold by', invoice.soldBy),
               if (invoice.branchId != null)
                 _metaRow('Branch', invoice.branchId!),
@@ -270,8 +205,6 @@ class InvoicePdfGenerator {
     );
   }
 
-  // ── ITEMS TABLE ───────────────────────────────────────────────────────────
-
   pw.Widget _buildItemsTable(dynamic invoice) {
     final headers = [
       '#', 'Medicine / Generic', 'Batch', 'Expiry',
@@ -279,85 +212,62 @@ class InvoicePdfGenerator {
     ];
 
     final colWidths = {
-      0: const pw.FlexColumnWidth(InvoiceTemplate.colFlexNo.toDouble()),
-      1: const pw.FlexColumnWidth(InvoiceTemplate.colFlexName.toDouble()),
-      2: const pw.FlexColumnWidth(InvoiceTemplate.colFlexBatch.toDouble()),
-      3: const pw.FlexColumnWidth(InvoiceTemplate.colFlexExpiry.toDouble()),
-      4: const pw.FlexColumnWidth(InvoiceTemplate.colFlexQty.toDouble()),
-      5: const pw.FlexColumnWidth(InvoiceTemplate.colFlexUnit.toDouble()),
-      6: const pw.FlexColumnWidth(InvoiceTemplate.colFlexDisc.toDouble()),
-      7: const pw.FlexColumnWidth(InvoiceTemplate.colFlexTotal.toDouble()),
+      0: pw.FlexColumnWidth(InvoiceTemplate.colFlexNo.toDouble()),
+      1: pw.FlexColumnWidth(InvoiceTemplate.colFlexName.toDouble()),
+      2: pw.FlexColumnWidth(InvoiceTemplate.colFlexBatch.toDouble()),
+      3: pw.FlexColumnWidth(InvoiceTemplate.colFlexExpiry.toDouble()),
+      4:  pw.FlexColumnWidth(InvoiceTemplate.colFlexQty.toDouble()),
+      5:  pw.FlexColumnWidth(InvoiceTemplate.colFlexUnit.toDouble()),
+      6:pw.FlexColumnWidth(InvoiceTemplate.colFlexDisc.toDouble()),
+      7: pw.FlexColumnWidth(InvoiceTemplate.colFlexTotal.toDouble()),
     };
 
     return pw.Table(
       columnWidths: colWidths,
       border: pw.TableBorder(
         horizontalInside: pw.BorderSide(
-          color: InvoiceTemplate.borderColor,
-          width: 0.5,
-        ),
+            color: InvoiceTemplate.borderColor, width: 0.5),
       ),
       children: [
-        // Header row
         pw.TableRow(
-          decoration: const pw.BoxDecoration(
-            color: InvoiceTemplate.tableHeaderBg,
-          ),
+          decoration: pw.BoxDecoration(color: InvoiceTemplate.tableHeaderBg),
           children: headers.map((h) => _tableHeader(h)).toList(),
         ),
-        // Item rows
         ...invoice.items.asMap().entries.map((entry) {
           final i    = entry.key;
           final item = entry.value;
-          final isAlt = i % 2 == 1;
           return pw.TableRow(
             decoration: pw.BoxDecoration(
-              color: isAlt
+              color: i % 2 == 1
                   ? InvoiceTemplate.tableAltRow
                   : InvoiceTemplate.white,
             ),
             children: [
-              _tableCell('${i + 1}',
+              _tableCell('${i + 1}', align: pw.TextAlign.center),
+              _tableCellDouble(top: item.tradeName, bottom: item.genericName),
+              _tableCell(item.batchNo, align: pw.TextAlign.center),
+              _tableCell(DateFormat('MMM yy').format(item.expiryDate),
                   align: pw.TextAlign.center),
-              _tableCellDouble(
-                top: item.tradeName,
-                bottom: item.genericName,
-              ),
-              _tableCell(item.batchNo,
-                  align: pw.TextAlign.center),
-              _tableCell(
-                DateFormat('MMM yy').format(item.expiryDate),
-                align: pw.TextAlign.center,
-              ),
-              _tableCell('${item.qty}',
-                  align: pw.TextAlign.center),
-              _tableCell(
-                _currFmt0.format(item.unitPrice),
-                align: pw.TextAlign.right,
-              ),
+              _tableCell('${item.qty}', align: pw.TextAlign.center),
+              _tableCell(_currFmt0.format(item.unitPrice),
+                  align: pw.TextAlign.right),
               _tableCell(
                 item.discountPct > 0
-                    ? '${item.discountPct.toStringAsFixed(0)}%'
-                    : '-',
+                    ? '${item.discountPct.toStringAsFixed(0)}%' : '-',
                 align: pw.TextAlign.center,
                 color: item.discountPct > 0
-                    ? InvoiceTemplate.accent
-                    : InvoiceTemplate.textLight,
+                    ? InvoiceTemplate.accent : InvoiceTemplate.textLight,
               ),
-              _tableCell(
-                _currFmt0.format(item.lineTotal),
-                align:  pw.TextAlign.right,
-                bold:   true,
-                color:  InvoiceTemplate.textDark,
-              ),
+              _tableCell(_currFmt0.format(item.lineTotal),
+                  align: pw.TextAlign.right,
+                  bold:  true,
+                  color: InvoiceTemplate.textDark),
             ],
           );
         }),
       ],
     );
   }
-
-  // ── TOTALS SECTION ────────────────────────────────────────────────────────
 
   pw.Widget _buildTotalsSection(dynamic invoice) {
     return pw.Row(
@@ -366,41 +276,32 @@ class InvoicePdfGenerator {
         pw.Container(
           width: 220,
           decoration: pw.BoxDecoration(
-            border: pw.Border.all(
+            border:       pw.Border.all(
                 color: InvoiceTemplate.borderColor, width: 0.5),
             borderRadius: InvoiceTemplate.radius,
           ),
           child: pw.Column(
             children: [
-              _totalRow('Subtotal',
-                  _currFmt.format(invoice.subtotal)),
+              _totalRow('Subtotal', _currFmt.format(invoice.subtotal)),
               if (invoice.totalDiscount > 0)
-                _totalRow(
-                  'Discount',
-                  '- ${_currFmt.format(invoice.totalDiscount)}',
-                  valueColor: InvoiceTemplate.accent,
-                ),
+                _totalRow('Discount',
+                    '- ${_currFmt.format(invoice.totalDiscount)}',
+                    valueColor: InvoiceTemplate.accent),
               if (invoice.totalTax > 0)
                 _totalRow('Tax (GST)',
                     '+ ${_currFmt.format(invoice.totalTax)}'),
               if (invoice.loyaltyDiscount > 0)
-                _totalRow(
-                  'Loyalty discount',
-                  '- ${_currFmt.format(invoice.loyaltyDiscount)}',
-                  valueColor: InvoiceTemplate.accent,
-                ),
+                _totalRow('Loyalty discount',
+                    '- ${_currFmt.format(invoice.loyaltyDiscount)}',
+                    valueColor: InvoiceTemplate.accent),
               pw.Divider(
-                  color: InvoiceTemplate.borderColor,
-                  thickness: 0.5),
-              _totalRow(
-                'GRAND TOTAL',
-                _currFmt.format(invoice.grandTotal),
-                bold:       true,
-                labelColor: InvoiceTemplate.primary,
-                valueColor: InvoiceTemplate.primary,
-                bgColor:    InvoiceTemplate.primaryLight,
-                fontSize:   11,
-              ),
+                  color: InvoiceTemplate.borderColor, thickness: 0.5),
+              _totalRow('GRAND TOTAL', _currFmt.format(invoice.grandTotal),
+                  bold:       true,
+                  labelColor: InvoiceTemplate.primary,
+                  valueColor: InvoiceTemplate.primary,
+                  bgColor:    InvoiceTemplate.primaryLight,
+                  fontSize:   11),
             ],
           ),
         ),
@@ -408,21 +309,19 @@ class InvoicePdfGenerator {
     );
   }
 
-  // ── PAYMENT SECTION ───────────────────────────────────────────────────────
-
   pw.Widget _buildPaymentSection(dynamic invoice) {
     return pw.Row(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        Expanded(
+        _PwExpanded(
           child: _infoBox(
             title: 'PAYMENT RECEIVED',
             children: [
               ...invoice.payments.map((p) => _metaRow(
-                    p.method.label,
-                    _currFmt.format(p.amount),
-                    valueColor: InvoiceTemplate.accent,
-                  )),
+                p.method.label,
+                _currFmt.format(p.amount),
+                valueColor: InvoiceTemplate.accent,
+              )),
               if (invoice.changeAmount > 0) ...[
                 pw.Divider(
                     color: InvoiceTemplate.borderColor,
@@ -436,7 +335,7 @@ class InvoicePdfGenerator {
         ),
         pw.SizedBox(width: 12),
         if (invoice.loyaltyPointsEarned > 0)
-          Expanded(
+          _PwExpanded(
             child: _infoBox(
               title: 'LOYALTY POINTS',
               children: [
@@ -452,15 +351,13 @@ class InvoicePdfGenerator {
     );
   }
 
-  // ── NOTES SECTION ─────────────────────────────────────────────────────────
-
   pw.Widget _buildNotesSection(String notes) {
     return pw.Container(
       decoration: pw.BoxDecoration(
-        color: const PdfColor.fromInt(0xFFFFFDE7),
+        color:        PdfColor.fromInt(0xFFFFFDE7),
         borderRadius: InvoiceTemplate.radius,
         border: pw.Border.all(
-            color: const PdfColor.fromInt(0xFFFFE082), width: 0.5),
+            color: PdfColor.fromInt(0xFFFFE082), width: 0.5),
       ),
       padding: const pw.EdgeInsets.all(10),
       child: pw.Row(
@@ -493,17 +390,14 @@ class InvoicePdfGenerator {
     );
   }
 
-  // ── THANK YOU BANNER ──────────────────────────────────────────────────────
-
   pw.Widget _buildThankYouBanner(PharmacyInfo pharmacy) {
     return pw.Container(
       width: double.infinity,
-      decoration: const pw.BoxDecoration(
-        color: InvoiceTemplate.primaryLight,
+      decoration: pw.BoxDecoration(
+        color:        InvoiceTemplate.primaryLight,
         borderRadius: InvoiceTemplate.radius,
       ),
-      padding: const pw.EdgeInsets.symmetric(
-          horizontal: 20, vertical: 12),
+      padding: const pw.EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: pw.Column(
         children: [
           pw.Text(
@@ -539,18 +433,16 @@ class InvoicePdfGenerator {
     );
   }
 
-  // ── HELPERS ───────────────────────────────────────────────────────────────
-
   Future<pw.Font> _loadFont(pw.Font font) async => font;
 
   pw.Widget _infoText(String text) => pw.Padding(
-        padding: const pw.EdgeInsets.only(bottom: 2),
-        child: pw.Text(text,
-            style: pw.TextStyle(
-              fontSize: InvoiceTemplate.fontSizeSmall,
-              color:    InvoiceTemplate.textMid,
-            )),
-      );
+    padding: const pw.EdgeInsets.only(bottom: 2),
+    child: pw.Text(text,
+        style: pw.TextStyle(
+          fontSize: InvoiceTemplate.fontSizeSmall,
+          color:    InvoiceTemplate.textMid,
+        )),
+  );
 
   pw.Widget _boldText(String text) => pw.Text(text,
       style: pw.TextStyle(
@@ -565,18 +457,17 @@ class InvoicePdfGenerator {
   }) {
     return pw.Container(
       decoration: pw.BoxDecoration(
-        border: pw.Border.all(
+        border:       pw.Border.all(
             color: InvoiceTemplate.borderColor, width: 0.5),
         borderRadius: InvoiceTemplate.radius,
       ),
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          // Title bar
           pw.Container(
-            decoration: const pw.BoxDecoration(
+            decoration: pw.BoxDecoration(
               color: InvoiceTemplate.primary,
-              borderRadius: pw.BorderRadius.only(
+              borderRadius: const pw.BorderRadius.only(
                 topLeft:  pw.Radius.circular(6),
                 topRight: pw.Radius.circular(6),
               ),
@@ -584,17 +475,14 @@ class InvoicePdfGenerator {
             padding: const pw.EdgeInsets.symmetric(
                 horizontal: 10, vertical: 5),
             width: double.infinity,
-            child: pw.Text(
-              title,
-              style: pw.TextStyle(
-                color:      InvoiceTemplate.white,
-                fontSize:   InvoiceTemplate.fontSizeTiny,
-                fontWeight: pw.FontWeight.bold,
-                letterSpacing: 0.5,
-              ),
-            ),
+            child: pw.Text(title,
+                style: pw.TextStyle(
+                  color:         InvoiceTemplate.white,
+                  fontSize:      InvoiceTemplate.fontSizeTiny,
+                  fontWeight:    pw.FontWeight.bold,
+                  letterSpacing: 0.5,
+                )),
           ),
-          // Content
           pw.Padding(
             padding: const pw.EdgeInsets.all(10),
             child: pw.Column(
@@ -607,11 +495,7 @@ class InvoicePdfGenerator {
     );
   }
 
-  pw.Widget _metaRow(
-    String label,
-    String value, {
-    PdfColor? valueColor,
-  }) {
+  pw.Widget _metaRow(String label, String value, {PdfColor? valueColor}) {
     return pw.Padding(
       padding: const pw.EdgeInsets.symmetric(vertical: 2),
       child: pw.Row(
@@ -619,9 +503,8 @@ class InvoicePdfGenerator {
         children: [
           pw.Text(label,
               style: pw.TextStyle(
-                fontSize: InvoiceTemplate.fontSizeSmall,
-                color:    InvoiceTemplate.textLight,
-              )),
+                  fontSize: InvoiceTemplate.fontSizeSmall,
+                  color:    InvoiceTemplate.textLight)),
           pw.Text(value,
               style: pw.TextStyle(
                 fontSize:   InvoiceTemplate.fontSizeSmall,
@@ -634,35 +517,30 @@ class InvoicePdfGenerator {
   }
 
   pw.Widget _tableHeader(String text) => pw.Padding(
-        padding: InvoiceTemplate.cellPadding,
-        child: pw.Text(
-          text,
-          style: pw.TextStyle(
-            color:      InvoiceTemplate.white,
-            fontSize:   InvoiceTemplate.fontSizeTiny,
-            fontWeight: pw.FontWeight.bold,
-          ),
-          textAlign: pw.TextAlign.center,
+    padding: InvoiceTemplate.cellPadding,
+    child: pw.Text(text,
+        style: pw.TextStyle(
+          color:      InvoiceTemplate.white,
+          fontSize:   InvoiceTemplate.fontSizeTiny,
+          fontWeight: pw.FontWeight.bold,
         ),
-      );
+        textAlign: pw.TextAlign.center),
+  );
 
-  pw.Widget _tableCell(
-    String text, {
-    pw.TextAlign align   = pw.TextAlign.left,
-    bool bold            = false,
+  pw.Widget _tableCell(String text, {
+    pw.TextAlign align = pw.TextAlign.left,
+    bool bold = false,
     PdfColor? color,
   }) {
     return pw.Padding(
       padding: InvoiceTemplate.cellPadding,
-      child: pw.Text(
-        text,
-        textAlign: align,
-        style: pw.TextStyle(
-          fontSize:   InvoiceTemplate.fontSizeSmall,
-          fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal,
-          color:      color ?? InvoiceTemplate.textDark,
-        ),
-      ),
+      child: pw.Text(text,
+          textAlign: align,
+          style: pw.TextStyle(
+            fontSize:   InvoiceTemplate.fontSizeSmall,
+            fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal,
+            color:      color ?? InvoiceTemplate.textDark,
+          )),
     );
   }
 
@@ -692,19 +570,16 @@ class InvoicePdfGenerator {
     );
   }
 
-  pw.Widget _totalRow(
-    String label,
-    String value, {
-    bool bold            = false,
+  pw.Widget _totalRow(String label, String value, {
+    bool bold = false,
     PdfColor? labelColor,
     PdfColor? valueColor,
     PdfColor? bgColor,
-    double fontSize      = 9.0,
+    double fontSize = 9.0,
   }) {
     return pw.Container(
       color: bgColor,
-      padding: const pw.EdgeInsets.symmetric(
-          horizontal: 12, vertical: 6),
+      padding: const pw.EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
@@ -728,46 +603,31 @@ class InvoicePdfGenerator {
   pw.Widget _buildStatusBadge(dynamic status) {
     String label;
     PdfColor color;
-
     switch (status.name) {
-      case 'paid':
-        label = 'PAID'; color = InvoiceTemplate.accent; break;
-      case 'credit':
-        label = 'CREDIT'; color = InvoiceTemplate.warning; break;
-      case 'returned':
-        label = 'RETURNED'; color = InvoiceTemplate.danger; break;
-      default:
-        label = 'VOID'; color = InvoiceTemplate.textLight;
+      case 'paid':     label = 'PAID';     color = InvoiceTemplate.accent;    break;
+      case 'credit':   label = 'CREDIT';   color = InvoiceTemplate.warning;   break;
+      case 'returned': label = 'RETURNED'; color = InvoiceTemplate.danger;    break;
+      default:         label = 'VOID';     color = InvoiceTemplate.textLight;
     }
-
     return pw.Container(
-      padding: const pw.EdgeInsets.symmetric(
-          horizontal: 10, vertical: 4),
+      padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: pw.BoxDecoration(
-        color: color,
+        color:        color,
         borderRadius: InvoiceTemplate.radius,
       ),
-      child: pw.Text(
-        label,
-        style: pw.TextStyle(
-          color:      InvoiceTemplate.white,
-          fontSize:   InvoiceTemplate.fontSizeTiny,
-          fontWeight: pw.FontWeight.bold,
-          letterSpacing: 1,
-        ),
-      ),
+      child: pw.Text(label,
+          style: pw.TextStyle(
+            color:         InvoiceTemplate.white,
+            fontSize:      InvoiceTemplate.fontSizeTiny,
+            fontWeight:    pw.FontWeight.bold,
+            letterSpacing: 1,
+          )),
     );
   }
 }
 
-/// Convenience extension for pw.Expanded (not in pdf package by default).
-extension _PwExpanded on pw.Widget {
-  pw.Widget expanded({int flex = 1}) => pw.Expanded(flex: flex, child: this);
-}
-
-// Inline Expanded helper used inside pw.Row
-class Expanded extends pw.StatelessWidget {
-  Expanded({required this.child, this.flex = 1});
+class _PwExpanded extends pw.StatelessWidget {
+  _PwExpanded({required this.child, this.flex = 1});
   final pw.Widget child;
   final int flex;
 

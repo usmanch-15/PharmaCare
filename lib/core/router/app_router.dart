@@ -2,101 +2,194 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-// Import your screens here:
-// import '../../features/auth/presentation/screens/login_screen.dart';
-// import '../../features/auth/presentation/screens/register_screen.dart';
-// import '../../features/auth/presentation/providers/auth_providers.dart';
-// ... etc
-
-/// App-wide GoRouter configuration.
-///
-/// Routes:
-///   /login            → LoginScreen
-///   /register         → RegisterScreen
-///   /                 → DashboardScreen
-///   /medicines        → MedicineListScreen
-///   /medicines/add    → AddMedicineScreen
-///   /inventory        → InventoryScreen
-///   /inventory/receive → ReceiveStockScreen
-///   /inventory/adjust → AdjustStockScreen
-///   /inventory/orders → PurchaseOrdersScreen
-///   /pos              → POSScreen (Cart)
-///   /sales            → SalesHistoryScreen
-///   /invoices/:id     → InvoiceDetailScreen
-///   /invoices/:id/pdf → PdfViewerScreen
-///   /reports          → ReportsScreen
-///   /customers        → CustomerListScreen
-///   /customers/add    → AddCustomerScreen
-///   /suppliers        → SupplierListScreen
-///   /notifications    → NotificationListScreen
-///   /backup           → BackupRestoreScreen
-///   /stores           → StoreManagementScreen
-///   /settings         → SettingsScreen
+import '../../features/backup/presentation/screens/backup_restore_screen.dart';
+import '../../features/customers/presentation/screens/add_customer_screen.dart';
+import '../../features/customers/presentation/screens/customer_list_screen.dart';
+import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
+import '../../features/inventory/presentation/screens/adjust_stock_screen.dart';
+import '../../features/inventory/presentation/screens/create_purchase_order_screen.dart';
+import '../../features/inventory/presentation/screens/inventory_screen.dart';
+import '../../features/inventory/presentation/screens/purchase_orders_screen.dart';
+import '../../features/medicines/presentation/screens/add_medicine_screen.dart';
+import '../../features/medicines/presentation/screens/medicine_list_screen.dart';
+import '../../features/notifications/presentation/screens/notification_list_screen.dart';
+import '../../features/reports/presentation/screens/reports_screen.dart';
+import '../../features/sales/presentation/screens/cart_screen.dart';
+import '../../features/sales/presentation/screens/invoice_detail_screen.dart';
+import '../../features/sales/presentation/screens/pos_screen.dart';
+import '../../features/sales/presentation/screens/sales_history_screen.dart';
+import '../../features/settings/presentation/screens/settings_screen.dart';
+import '../../features/stores/presentation/screens/store_management_screen.dart';
+import '../../features/suppliers/presentation/screens/supplier_list_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  // Watch auth state for redirect
-  // final authState = ref.watch(authStateProvider);
-
   return GoRouter(
-    initialLocation: '/login',
-    // redirect: (context, state) {
-    //   final isLoggedIn = authState.value != null;
-    //   final isOnLogin  = state.matchedLocation == '/login' ||
-    //                      state.matchedLocation == '/register';
-    //   if (!isLoggedIn && !isOnLogin) return '/login';
-    //   if (isLoggedIn  && isOnLogin)  return '/';
-    //   return null;
-    // },
+    initialLocation: '/',
     routes: [
-      GoRoute(path: '/login',    builder: (_, __) => const _Placeholder('LoginScreen')),
-      GoRoute(path: '/register', builder: (_, __) => const _Placeholder('RegisterScreen')),
-      GoRoute(path: '/',         builder: (_, __) => const _Placeholder('DashboardScreen')),
-      GoRoute(path: '/medicines', builder: (_, __) => const _Placeholder('MedicineListScreen'),
+
+      // ── Dashboard ──────────────────────────────────────────────────────
+      GoRoute(
+        path: '/',
+        builder: (_, __) => const DashboardScreen(),
+      ),
+
+      // ── Medicines ──────────────────────────────────────────────────────
+      GoRoute(
+        path: '/medicines',
+        builder: (_, __) => const MedicineListScreen(),
         routes: [
-          GoRoute(path: 'add',  builder: (_, __) => const _Placeholder('AddMedicineScreen')),
-          GoRoute(path: ':id',  builder: (_, s)  => _Placeholder('EditMedicineScreen ${s.pathParameters['id']}')),
-        ]),
-      GoRoute(path: '/inventory', builder: (_, __) => const _Placeholder('InventoryScreen'),
+          GoRoute(
+            path: 'add',
+            builder: (_, __) => const AddMedicineScreen(),
+          ),
+          GoRoute(
+            path: ':id',
+            builder: (_, state) => Scaffold(
+              appBar: AppBar(
+                title: const Text('Edit Medicine'),
+                backgroundColor: const Color(0xFFF7F8FC),
+                elevation: 0,
+              ),
+              body: Center(
+                child: Text(
+                  'Edit Medicine: ${state.pathParameters['id']}',
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+
+      // ── Inventory ──────────────────────────────────────────────────────
+      GoRoute(
+        path: '/inventory',
+        builder: (_, __) => const InventoryScreen(),
         routes: [
-          GoRoute(path: 'receive', builder: (_, __) => const _Placeholder('ReceiveStockScreen')),
-          GoRoute(path: 'adjust',  builder: (_, __) => const _Placeholder('AdjustStockScreen')),
-          GoRoute(path: 'orders',  builder: (_, __) => const _Placeholder('PurchaseOrdersScreen')),
-          GoRoute(path: 'orders/new', builder: (_, __) => const _Placeholder('CreatePurchaseOrderScreen')),
-        ]),
-      GoRoute(path: '/pos',     builder: (_, __) => const _Placeholder('POSScreen')),
-      GoRoute(path: '/sales',   builder: (_, __) => const _Placeholder('SalesHistoryScreen')),
-      GoRoute(path: '/invoices/:id', builder: (_, s) => _Placeholder('InvoiceDetailScreen ${s.pathParameters['id']}'),
+          GoRoute(
+            path: 'receive',
+            builder: (_, __) => Scaffold(
+              appBar: AppBar(
+                title: const Text('Receive Stock'),
+                backgroundColor: const Color(0xFFF7F8FC),
+                elevation: 0,
+              ),
+              body: const Center(child: Text('Receive Stock Screen')),
+            ),
+          ),
+          GoRoute(
+            path: 'adjust',
+            builder: (_, __) => Scaffold(
+              appBar: AppBar(
+                title: const Text('Adjust Stock'),
+                backgroundColor: const Color(0xFFF7F8FC),
+                elevation: 0,
+              ),
+              body: const Center(child: Text('Adjust Stock Screen')),
+            ),
+          ),
+          GoRoute(
+            path: 'orders',
+            builder: (_, __) => const PurchaseOrdersScreen(),
+            routes: [
+              GoRoute(
+                path: 'new',
+                builder: (_, __) => const CreatePurchaseOrderScreen(),
+              ),
+            ],
+          ),
+        ],
+      ),
+
+      // ── Sales / POS ────────────────────────────────────────────────────
+      GoRoute(
+        path: '/pos',
+        builder: (_, __) => const POSScreen(),
+      ),
+      GoRoute(
+        path: '/cart',
+        builder: (_, __) => const CartScreen(),
+      ),
+      GoRoute(
+        path: '/sales',
+        builder: (_, __) => const SalesHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/invoices/:id',
+        builder: (_, state) =>
+            InvoiceDetailScreen(invoiceId: state.pathParameters['id']!),
+      ),
+
+      // ── Reports ────────────────────────────────────────────────────────
+      GoRoute(
+        path: '/reports',
+        builder: (_, __) => const ReportsScreen(),
+      ),
+
+      // ── Customers ──────────────────────────────────────────────────────
+      GoRoute(
+        path: '/customers',
+        builder: (_, __) => const CustomerListScreen(),
         routes: [
-          GoRoute(path: 'pdf', builder: (_, s) => _Placeholder('PdfViewerScreen ${s.pathParameters['id']}')),
-        ]),
-      GoRoute(path: '/reports',       builder: (_, __) => const _Placeholder('ReportsScreen')),
-      GoRoute(path: '/customers',     builder: (_, __) => const _Placeholder('CustomerListScreen'),
-        routes: [
-          GoRoute(path: 'add', builder: (_, __) => const _Placeholder('AddCustomerScreen')),
-        ]),
-      GoRoute(path: '/suppliers',     builder: (_, __) => const _Placeholder('SupplierListScreen')),
-      GoRoute(path: '/notifications', builder: (_, __) => const _Placeholder('NotificationListScreen')),
-      GoRoute(path: '/backup',        builder: (_, __) => const _Placeholder('BackupRestoreScreen')),
-      GoRoute(path: '/stores',        builder: (_, __) => const _Placeholder('StoreManagementScreen')),
-      GoRoute(path: '/settings',      builder: (_, __) => const _Placeholder('SettingsScreen')),
+          GoRoute(
+            path: 'add',
+            builder: (_, __) => const AddCustomerScreen(),
+          ),
+        ],
+      ),
+
+      // ── Suppliers ──────────────────────────────────────────────────────
+      GoRoute(
+        path: '/suppliers',
+        builder: (_, __) => const SupplierListScreen(),
+      ),
+
+      // ── Notifications ──────────────────────────────────────────────────
+      GoRoute(
+        path: '/notifications',
+        builder: (_, __) => const NotificationListScreen(),
+      ),
+
+      // ── Stores ─────────────────────────────────────────────────────────
+      GoRoute(
+        path: '/stores',
+        builder: (_, __) => const StoreManagementScreen(),
+      ),
+
+      // ── Backup ─────────────────────────────────────────────────────────
+      GoRoute(
+        path: '/backup',
+        builder: (_, __) => const BackupRestoreScreen(),
+      ),
+
+      // ── Settings ───────────────────────────────────────────────────────
+      GoRoute(
+        path: '/settings',
+        builder: (_, __) => const SettingsScreen(),
+      ),
     ],
+
     errorBuilder: (_, state) => Scaffold(
-      body: Center(child: Text('Page not found: ${state.error}')),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline_rounded,
+                size: 44, color: Color(0xFFE53935)),
+            const SizedBox(height: 12),
+            const Text('Page not found',
+                style: TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: () => GoRouter.of(_).go('/'),
+              style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF1565C0)),
+              child: const Text('Go to Dashboard'),
+            ),
+          ],
+        ),
+      ),
     ),
   );
 });
-
-/// Placeholder widget — replace with real screen imports.
-class _Placeholder extends StatelessWidget {
-  const _Placeholder(this.name);
-  final String name;
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text(name)),
-        body: Center(
-          child: Text(name,
-              style: const TextStyle(
-                  fontSize: 16, color: Color(0xFF888888))),
-        ),
-      );
-}

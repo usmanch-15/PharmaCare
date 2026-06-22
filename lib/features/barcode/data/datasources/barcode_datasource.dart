@@ -1,4 +1,4 @@
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:mobile_scanner/mobile_scanner.dart' hide BarcodeFormat;
 import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../domain/entities/scan_result.dart';

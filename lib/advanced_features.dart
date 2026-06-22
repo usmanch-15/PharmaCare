@@ -7,6 +7,3 @@
 export 'features/notifications/notifications.dart';
 export 'features/voice_search/voice_search.dart';
 export 'features/export/export.dart';
-export 'features/stores/stores.dart';
-export 'features/recommendations/recommendations.dart';
-export 'features/backup/backup.dart';

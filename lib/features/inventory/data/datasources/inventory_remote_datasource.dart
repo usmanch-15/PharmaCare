@@ -201,7 +201,7 @@ class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
         final current = (doc.data()!['qtyAvailable'] as num).toInt();
         if (current < qty) {
           throw InsufficientStockException(
-              doc.data()!['tradeName'] as String? ?? batchId);
+              medicineName: doc.data()?['tradeName'] as String? ?? batchId);
         }
         txn.update(ref, {
           'qtySold': FieldValue.increment(qty),

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/usecases/usecase.dart';
 import '../../data/datasources/active_store_local_datasource.dart';
 import '../../data/datasources/store_remote_datasource.dart';
 import '../../data/repositories/store_repository_impl.dart';

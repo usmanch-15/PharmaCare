@@ -30,7 +30,7 @@ dependencies:
 
   # PDF
   pdf: ^3.11.1
-  printing: ^5.13.2
+  printing: ^5.13.1
   open_file: ^3.3.2
 
   # Charts

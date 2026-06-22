@@ -10,27 +10,40 @@ class VoiceSearchRepositoryImpl implements VoiceSearchRepository {
   final SpeechRecognitionDataSource _ds;
 
   Either<Failure, T> _h<T>(Object e) {
-    if (e is PermissionException) return Left(PermissionFailure(e.message));
+    if (e is PermissionException) {
+      return Left(PermissionFailure(e.message ?? 'Permission denied'));
+    }
     return Left(UnexpectedFailure(e.toString()));
   }
 
-  @override Future<Either<Failure, bool>> hasPermission() async {
+  @override
+  Future<Either<Failure, bool>> hasPermission() async {
     try { return Right(await _ds.hasPermission()); } catch (e) { return _h(e); }
   }
-  @override Future<Either<Failure, bool>> requestPermission() async {
+
+  @override
+  Future<Either<Failure, bool>> requestPermission() async {
     try { return Right(await _ds.requestPermission()); } catch (e) { return _h(e); }
   }
-  @override Future<Either<Failure, bool>> isAvailable() async {
+
+  @override
+  Future<Either<Failure, bool>> isAvailable() async {
     try { return Right(await _ds.isAvailable()); } catch (e) { return _h(e); }
   }
-  @override Stream<Either<Failure, VoiceSearchResult>> startListening() =>
+
+  @override
+  Stream<Either<Failure, VoiceSearchResult>> startListening() =>
       _ds.startListening()
-         .map<Either<Failure, VoiceSearchResult>>(Right.new)
-         .handleError((e) => _h<VoiceSearchResult>(e));
-  @override Future<Either<Failure, void>> stopListening() async {
+          .map<Either<Failure, VoiceSearchResult>>(Right.new)
+          .handleError((e) => _h<VoiceSearchResult>(e));
+
+  @override
+  Future<Either<Failure, void>> stopListening() async {
     try { await _ds.stopListening(); return const Right(null); } catch (e) { return _h(e); }
   }
-  @override Future<Either<Failure, void>> cancelListening() async {
+
+  @override
+  Future<Either<Failure, void>> cancelListening() async {
     try { await _ds.cancelListening(); return const Right(null); } catch (e) { return _h(e); }
   }
 }
